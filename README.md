@@ -1,4 +1,4 @@
-# Charging Control Readme
+# Charging Control
 This repository contains code for controlling a Tapo socket based on battery percentage of the host system. It ensures the socket is turned on when the battery falls below a certain threshold and turned off when the battery reaches a certain level while charging.
 
 ## Setup
