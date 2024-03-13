@@ -1,0 +1,11 @@
+certifi==2024.2.2
+charset-normalizer==3.3.2
+idna==3.6
+pkcs7==0.1.2
+psutil==5.9.8
+pycryptodome==3.20.0
+PyP100 @ git+https://github.com/almottier/TapoP100.git@04c452fd8af9d8505e4177ba3df157372ce3ee0c
+python-dotenv==1.0.1
+pywin32==306
+requests==2.31.0
+urllib3==2.2.1
