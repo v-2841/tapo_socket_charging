@@ -20,6 +20,10 @@ PASSWORD = os.getenv('PASSWORD')
 MIN_BATTERY_PERCENTAGE = 40
 MAX_BATTERY_PERCENTAGE = 60
 UPDATE_INTERVAL = 10
+TASK_NAME = 'Tapo Charging'
+TASK_DESCRIPTION = 'Task for charging control of Tapo socket'
+PROJECT_FOLDER_PATH = os.getcwd()
+FILE_NAME = os.path.basename(__file__)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -31,7 +35,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def socket_init():
+def socket_init() -> None:
+    """Initializes socket."""
     global p100
     while True:
         try:
@@ -60,13 +65,25 @@ def socket_init():
         sleep(UPDATE_INTERVAL)
 
 
-def main():
+if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == '--add-to-taskschd':
-            add_to_taskschd()
+            add_to_taskschd(
+                TASK_NAME,
+                TASK_DESCRIPTION,
+                PROJECT_FOLDER_PATH,
+                FILE_NAME,
+            )
             sys.exit(0)
         elif sys.argv[1] == '--remove-from-taskschd':
-            remove_from_taskschd()
+            remove_from_taskschd(TASK_NAME)
+            sys.exit(0)
+        elif sys.argv[1] == '--help':
+            print('Usage: python charging.py [--add-to-taskschd | '
+                  '--remove-from-taskschd | --help]\n'
+                  '--add-to-taskschd: Add task to taskschd.\n'
+                  '--remove-from-taskschd: Remove task from taskschd.\n'
+                  '--help: Show this help message.')
             sys.exit(0)
         else:
             print('Invalid argument.')
@@ -74,6 +91,10 @@ def main():
     socket_init()
     while True:
         battery = psutil.sensors_battery()
+        if not battery:
+            logger.error('Failed to get battery information. Retrying...')
+            sleep(UPDATE_INTERVAL)
+            continue
         logger.info(
             f'Battery: {battery.percent}%, charging: {battery.power_plugged}')
         if (battery.percent < MIN_BATTERY_PERCENTAGE
@@ -93,7 +114,3 @@ def main():
                 logger.error('Failed to turn off socket. Retrying...')
                 socket_init()
         sleep(UPDATE_INTERVAL)
-
-
-if __name__ == '__main__':
-    main()
